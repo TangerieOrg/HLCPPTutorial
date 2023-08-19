@@ -1,0 +1,27 @@
+Output/
+
+.idea/
+
+# Visual Studio
+.vs/
+*.vcxproj*
+VS_Solution/*
+!VS_Solution/generate_vs_solution.bat
+
+# Ninja
+ClangNinja/*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+
+# CLion
+# Not ignoring CLion files as I want the project targets & settings, inspections etc to be able to be shared
+_ReSharper.Caches/
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
