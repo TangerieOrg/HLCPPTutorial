@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(TARGET TemplateMod)
+set(TARGET SloMoMod)
 project(${TARGET})
 
 FILE(GLOB_RECURSE ${TARGET}_HEADERS "src/*.hpp")

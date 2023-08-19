@@ -1,1 +1,2 @@
 add_subdirectory(TemplateMod)
+add_subdirectory(SloMoMod)
