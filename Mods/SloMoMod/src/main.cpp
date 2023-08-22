@@ -11,6 +11,7 @@
 
 #include <ModUtils/Extensions.hpp>
 #include <Macros.hpp>
+#include <Windows.h>
 
 
 using namespace RC;
@@ -104,13 +105,16 @@ public:
 
 	float currentDilation = 0;
 
+	AActor* player_controller = nullptr;
+
 	void on_unreal_init() override {
-		LOG("Initialized");
 		Hook::RegisterBeginPlayPostCallback([&](AActor* Context) {
-			LOG("Begin Play");
-			LOG_EXPR(Context->GetFullName());
-			LOG_EXPR(UGameplayStaticsExtended::GetGlobalTimeDilation(Context));
-			UGameplayStaticsExtended::SetGlobalTimeDilation(Context, 200);
+			// Doubt this is needed
+			if (!(Context && Context->GetClassPrivate())) return;
+			if (Context->GetClassPrivate()->GetName() == STR("BP_Phoenix_Player_Controller_C")) {
+				player_controller = Context;
+				LOG_EXPR((void*)player_controller);
+			}
 		});
 	}
 
@@ -118,13 +122,32 @@ public:
 
 	}
 
-	//int tick = -6000;
 	auto on_update() -> void override
 	{
-		/*tick++;
-		if (tick % 600 == 0) {
-			LOG_EXPR(UGameplayStaticsExtended::GetGlobalTimeDilation());
-		}*/
+		TRY([&]() {
+			// TODO => Use Input::Handler for window focus stuff
+			if (GetAsyncKeyState(Input::Key::OEM_COMMA)) {
+				// Check if player is valid
+				if (!player_controller || !Unreal::UObjectArray::IsValid(player_controller->GetObjectItem(), false)) {
+					if (player_controller) LOG("Player became invalid");
+					player_controller = nullptr;
+					return;
+				}
+				if (GetAsyncKeyState(Input::ModifierKey::ALT)) {
+					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.33);
+				}
+				else if (GetAsyncKeyState(Input::ModifierKey::CONTROL)) {
+					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.5);
+				}
+				else if (GetAsyncKeyState(Input::ModifierKey::SHIFT)) {
+					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.66);
+				}
+				else {
+					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 1.0);
+				}
+			}
+		});
+		
 	}
 };
 
