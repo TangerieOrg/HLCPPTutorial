@@ -20,11 +20,13 @@ namespace HLCPPTutorial {
 class UGameplayStaticsExtended : public UObject {
 	// Helper from Unreal submodule helps us automatically reference UFunctions
 	struct StaticFunctions {
+		// Template type is reqired for the Self pointer in StaticReflectedFunctionBase
 		static inline StaticReflectedFunctionBase<UGameplayStaticsExtended> GetGlobalTimeDilation{STR("/Script/Engine.GameplayStatics:GetGlobalTimeDilation")};
 		static inline StaticReflectedFunctionBase<UGameplayStaticsExtended> SetGlobalTimeDilation{STR("/Script/Engine.GameplayStatics:SetGlobalTimeDilation")};
 	};
 
 public:
+	// Required for static functions by StaticReflectedFunctionBase (Unreal/ReflectedFunction.hpp Line 35)
 	static inline UGameplayStaticsExtended* Self{nullptr};
 
 private:
@@ -44,13 +46,13 @@ private:
 
 public:
 	static float GetGlobalTimeDilation(UObject* WorldContextObject) {
-		if (!VerifySelf()) {
-			return -1;
-		}
-		if (!StaticFunctions::GetGlobalTimeDilation.IsValid()) {
-			return 0;
+		// Checks/assigns the instance if its available
+		if (!VerifySelf() || !StaticFunctions::GetGlobalTimeDilation.IsValid()) {
+			return 1;
 		}
 
+		// Parameters are passed as a struct (including the return value)
+		// The properties for this can be seen in live view
 		struct Params
 		{
 			const UObject* WorldContextObject;
@@ -66,10 +68,7 @@ public:
 	}
 
 	static void SetGlobalTimeDilation(UObject* WorldContextObject, float TimeDilation) {
-		if (!VerifySelf()) {
-			return;
-		}
-		if (!StaticFunctions::SetGlobalTimeDilation.IsValid()) {
+		if (!VerifySelf() || !StaticFunctions::SetGlobalTimeDilation.IsValid()) {
 			return;
 		}
 
@@ -77,7 +76,6 @@ public:
 		{
 			const UObject* WorldContextObject{};
 			float TimeDilation;
-			void* ReturnValue;
 		};
 
 		Params p{
@@ -86,8 +84,6 @@ public:
 		};
 
 		StaticFunctions::SetGlobalTimeDilation(p);
-
-		return;
 	}
 };
 
