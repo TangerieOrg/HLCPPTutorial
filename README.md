@@ -19,6 +19,8 @@ Alternatively, if you have CLion, just open the folder
 
 ## Building / Running Notes
 If you're mod seems to cause a crash on load for no reason, try building UE4SS youreself and using those dlls instead of the official release.
+Also personally I find debug builds to be quite unstable so also try building in release mode (make sure to rebuild ue4ss aswell)
+
 
 The output files of mods will be in `Output/Mods/<ModName>/Debug` or `Output/Mods/<ModName>/Release`
 
