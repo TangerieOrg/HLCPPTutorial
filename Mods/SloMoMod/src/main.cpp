@@ -101,11 +101,38 @@ public:
 
 	~SloMoMod()
 	{
+		// If mod is disabled, reset the dilation
+		SetDilation(1.0);
 	}
 
 	float currentDilation = 0;
 
 	AActor* player_controller = nullptr;
+
+	bool CheckPlayer() {
+		// Check if player is valid
+		if (!player_controller || !Unreal::UObjectArray::IsValid(player_controller->GetObjectItem(), false)) {
+			if (player_controller) LOG("Player became invalid");
+			player_controller = nullptr;
+			return false;
+		}
+		return true;
+	}
+
+	float GetDilation() {
+		if (CheckPlayer()) {
+			return UGameplayStaticsExtended::GetGlobalTimeDilation(player_controller);
+		}
+		else {
+			return 1.0;
+		}
+	}
+
+	void SetDilation(float dilation) {
+		if (CheckPlayer()) {
+			UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, dilation);
+		}
+	}
 
 	void on_unreal_init() override {
 		Hook::RegisterBeginPlayPostCallback([&](AActor* Context) {
@@ -127,23 +154,17 @@ public:
 		TRY([&]() {
 			// TODO => Use Input::Handler for window focus stuff
 			if (GetAsyncKeyState(Input::Key::OEM_COMMA)) {
-				// Check if player is valid
-				if (!player_controller || !Unreal::UObjectArray::IsValid(player_controller->GetObjectItem(), false)) {
-					if (player_controller) LOG("Player became invalid");
-					player_controller = nullptr;
-					return;
-				}
 				if (GetAsyncKeyState(Input::ModifierKey::ALT)) {
-					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.33);
+					SetDilation(0.33);
 				}
 				else if (GetAsyncKeyState(Input::ModifierKey::CONTROL)) {
-					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.5);
+					SetDilation(0.5);
 				}
 				else if (GetAsyncKeyState(Input::ModifierKey::SHIFT)) {
-					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 0.66);
+					SetDilation(0.66);
 				}
 				else {
-					UGameplayStaticsExtended::SetGlobalTimeDilation(player_controller, 1.0);
+					SetDilation(1.0);
 				}
 			}
 		});
